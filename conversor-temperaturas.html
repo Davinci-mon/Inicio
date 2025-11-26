@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Temperaturas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .resultado.mostrar {
+            display: block;
+        }
+
+        .resultado h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .conversion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .conversion-item:last-child {
+            border-bottom: none;
+        }
+
+        .conversion-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .conversion-valor {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        .error.mostrar {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌡️ Conversor de Temperaturas</h1>
+
+        <div class="form-group">
+            <label for="celsius">Ingresa la temperatura en Celsius (°C):</label>
+            <input 
+                type="number" 
+                id="celsius" 
+                placeholder="Ej: 25" 
+                step="0.01"
+            >
+        </div>
+
+        <button onclick="convertir()">Convertir</button>
+
+        <div class="error" id="error"></div>
+
+        <div class="resultado" id="resultado">
+            <h2>Conversión realizada:</h2>
+            <div class="conversion-item">
+                <span class="conversion-label">Celsius (°C)</span>
+                <span class="conversion-valor" id="val-celsius">-</span>
+            </div>
+            <div class="conversion-item">
+                <span class="conversion-label">Fahrenheit (°F)</span>
+                <span class="conversion-valor" id="val-fahrenheit">-</span>
+            </div>
+            <div class="conversion-item">
+                <span class="conversion-label">Kelvin (K)</span>
+                <span class="conversion-valor" id="val-kelvin">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Función: convertirTemperatura
+         * Descripción: Convierte una temperatura en Celsius a Fahrenheit y Kelvin
+         * 
+         * Parámetros:
+         *   - celsius (number): la temperatura en grados Celsius
+         * 
+         * Retorna:
+         *   - object: objeto con las conversiones { celsius, fahrenheit, kelvin }
+         */
+        function convertirTemperatura(celsius) {
+            // Validar que el parámetro sea un número
+            if (typeof celsius !== 'number' || isNaN(celsius)) {
+                throw new Error("Debes ingresar un número válido");
+            }
+
+            // FÓRMULA 1: Celsius a Fahrenheit
+            // Fahrenheit = (Celsius × 9/5) + 32
+            // Ejemplo: 0°C = 32°F, 100°C = 212°F
+            const fahrenheit = (celsius * 9/5) + 32;
+
+            // FÓRMULA 2: Celsius a Kelvin
+            // Kelvin = Celsius + 273.15
+            // Kelvin es la escala absoluta usada en física
+            // 0 Kelvin = -273.15°C (temperatura más baja posible)
+            const kelvin = celsius + 273.15;
+
+            // Retornar un objeto con los tres valores redondeados a 2 decimales
+            return {
+                celsius: Math.round(celsius * 100) / 100,      // redondear a 2 decimales
+                fahrenheit: Math.round(fahrenheit * 100) / 100,
+                kelvin: Math.round(kelvin * 100) / 100
+            };
+        }
+
+        /**
+         * Función: convertir
+         * Descripción: Obtiene el valor del input y muestra el resultado en la página
+         */
+        function convertir() {
+            const input = document.getElementById('celsius');
+            const valor = parseFloat(input.value);
+            const errorDiv = document.getElementById('error');
+            const resultadoDiv = document.getElementById('resultado');
+
+            // Limpiar mensajes previos
+            errorDiv.classList.remove('mostrar');
+            errorDiv.textContent = '';
+
+            // Validar entrada
+            if (input.value.trim() === '') {
+                errorDiv.textContent = '⚠️ Por favor, ingresa una temperatura';
+                errorDiv.classList.add('mostrar');
+                resultadoDiv.classList.remove('mostrar');
+                return;
+            }
+
+            if (isNaN(valor)) {
+                errorDiv.textContent = '⚠️ Por favor, ingresa un número válido';
+                errorDiv.classList.add('mostrar');
+                resultadoDiv.classList.remove('mostrar');
+                return;
+            }
+
+            try {
+                // Llamar la función de conversión
+                const resultado = convertirTemperatura(valor);
+
+                // Mostrar los resultados en la página
+                document.getElementById('val-celsius').textContent = resultado.celsius;
+                document.getElementById('val-fahrenheit').textContent = resultado.fahrenheit;
+                document.getElementById('val-kelvin').textContent = resultado.kelvin;
+
+                // Mostrar el bloque de resultados
+                resultadoDiv.classList.add('mostrar');
+
+            } catch (error) {
+                errorDiv.textContent = '❌ ' + error.message;
+                errorDiv.classList.add('mostrar');
+                resultadoDiv.classList.remove('mostrar');
+            }
+        }
+
+        /**
+         * Permitir convertir presionando Enter en el input
+         */
+        document.getElementById('celsius').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                convertir();
+            }
+        });
+    </script>
+</body>
+</html>
