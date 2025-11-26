@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>¿Qué es un compromiso?</title>
+  <style>
+    :root {
+      --bg1: #f8fafc;
+      --card: #ffffff;
+      --accent: #9ad3d6;
+      --text: #0f1724;
+      --muted: #556;
+      --shadow: 0 8px 30px rgba(16,24,40,0.06);
+      --radius: 14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: Inter, Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg,var(--bg1),#eef6f8);
+      color:var(--text);
+      padding:32px;
+    }
+    .container{
+      width:100%;
+      max-width:880px;
+      transform:translateY(0);
+      animation:fadeUp 700ms ease both;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.9), var(--card));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
+      border:1px solid rgba(10,20,30,0.03);
+      backdrop-filter: blur(6px);
+      transition:transform 300ms ease, box-shadow 300ms ease;
+    }
+    .card:hover{ transform: translateY(-6px); box-shadow:0 18px 40px rgba(16,24,40,0.08); }
+    .hdr{
+      display:flex; gap:12px; align-items:center; margin-bottom:12px;
+    }
+    .badge{
+      width:52px; height:52px; border-radius:12px;
+      background:linear-gradient(135deg,#e6fbfb, #c6f0f2);
+      display:grid; place-items:center; font-weight:700; color:#045;
+      box-shadow:0 6px 18px rgba(10,20,30,0.04);
+      font-size:18px;
+    }
+    .title{ font-size:20px; font-weight:700; margin:0; }
+    .subtitle{ color:var(--muted); font-size:14px; margin-top:6px; }
+
+    .content p{ line-height:1.6; margin:12px 0; color:#1b2b34; }
+    .list{ margin:12px 0 0 20px; color:#1b2b34; }
+    .list li{ margin:8px 0; }
+
+    .fade{
+      animation:fadeIn 900ms ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(14px) scale(.998); }
+      to { opacity:1; transform: translateY(0) scale(1); }
+    }
+    @keyframes floaty {
+      0%{ transform: translateY(0) }
+      50%{ transform: translateY(-6px) }
+      100%{ transform: translateY(0) }
+    }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(8px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    @media (max-width:520px){
+      .card{ padding:20px; border-radius:12px; }
+      .badge{ width:46px; height:46px; font-size:16px; }
+      .title{ font-size:18px; }
+    }
+    .footer{ margin-top:18px; font-size:13px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <article class="card" role="article" aria-labelledby="titulo">
+      <div class="hdr">
+        <div class="badge">💬</div>
+        <div>
+          <h1 id="titulo" class="title">¿Qué es un compromiso y por qué es importante?</h1>
+          <div class="subtitle">Definición breve y razones clave</div>
+        </div>
+      </div>
+
+      <section class="content fade" aria-label="definición">
+        <p><strong>Definición:</strong> Un compromiso es una promesa u obligación asumida — puede ser personal, profesional o social — que vincula a una persona o grupo a realizar una acción o mantener una conducta dentro de un plazo o condición acordada.</p>
+
+        <p><strong>Por qué es importante:</strong></p>
+        <ul class="list">
+          <li>Genera confianza: otros pueden contar con que se cumplirá lo acordado.</li>
+          <li>Facilita la coordinación: permite planificar y sincronizar acciones entre personas o equipos.</li>
+          <li>Aumenta la responsabilidad: establece criterios para evaluar cumplimiento y corregir desviaciones.</li>
+          <li>Potencia la reputación: el cumplimiento consistente mejora la credibilidad y oportunidades futuras.</li>
+          <li>Sostiene metas a largo plazo: ayuda a mantener el enfoque y la perseverancia frente a obstáculos.</li>
+        </ul>
+
+        <p class="fade"><em>Ejemplo:</em> un compromiso laboral (entregar un proyecto a tiempo) organiza prioridades, guía decisiones y protege la relación con el empleador o cliente.</p>
+      </section>
+
+      <div class="footer">Diseño: estilos suaves y animaciones sutiles para lectura cómoda.</div>
+    </article>
+  </main>
+
+  <script>
+    // Pequeña animación extra: animar la insignia brevemente
+    document.addEventListener('DOMContentLoaded', () => {
+      const badge = document.querySelector('.badge');
+      if (badge) {
+        badge.style.animation = 'floaty 2500ms ease-in-out 0s both';
+      }
+    });
+  </script>
+</body>
+</html>
