@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Colores Aleatorios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            letter-spacing: -0.5px;
+        }
+
+        .color-display {
+            width: 100%;
+            height: 300px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            background: #ff6b6b;
+            transition: background-color 0.5s ease;
+            box-shadow: 0 10px 40px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 0.6s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        .code-display {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hex-code {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-generar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-generar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-generar:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-copiar {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #667eea;
+        }
+
+        .btn-copiar:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .btn-copiar:active {
+            transform: translateY(-1px);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #27ae60;
+            font-weight: 600;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feedback.mostrar {
+            opacity: 1;
+        }
+
+        .info {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            text-align: left;
+            border-radius: 5px;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            .color-display {
+                height: 250px;
+                margin-bottom: 20px;
+            }
+
+            .code-display {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .hex-code {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Generador de Colores Aleatorios</h1>
+
+        <!-- Div que muestra el color actual -->
+        <div class="color-display" id="colorDisplay"></div>
+
+        <!-- Sección que muestra el código hexadecimal -->
+        <div class="code-display">
+            <span class="hex-code" id="hexCode">#FF6B6B</span>
+            <button class="btn-copiar" onclick="copiarAlPortapapeles()">Copiar</button>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="button-group">
+            <button class="btn-generar" onclick="generarColor()">Generar Color</button>
+        </div>
+
+        <!-- Feedback visual al copiar -->
+        <div class="feedback" id="feedback">✓ ¡Código copiado al portapapeles!</div>
+
+        <!-- Información adicional -->
+        <div class="info">
+            <strong>💡 Consejo:</strong> Presiona <kbd>Enter</kbd> para generar un nuevo color, o haz clic en el div de color para generar automáticamente.
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // FUNCIÓN: generarColorHexAleatorio
+        // Descripción: Genera un código de color hexadecimal aleatorio
+        // Rango: #000000 a #FFFFFF
+        // Retorna: string con formato #RRGGBB
+        // =====================================================
+        function generarColorHexAleatorio() {
+            // Generar 3 números aleatorios de 0 a 255 (para R, G, B)
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+
+            // Convertir cada número a hexadecimal y rellenar con cero si es necesario
+            // Método: padStart(2, '0') asegura que siempre tenga 2 dígitos
+            // toString(16) convierte de decimal a hexadecimal
+            const hexR = r.toString(16).padStart(2, '0').toUpperCase();
+            const hexG = g.toString(16).padStart(2, '0').toUpperCase();
+            const hexB = b.toString(16).padStart(2, '0').toUpperCase();
+
+            // Retornar el código hexadecimal completo
+            return `#${hexR}${hexG}${hexB}`;
+        }
+
+        // =====================================================
+        // FUNCIÓN: generarColor
+        // Descripción: Genera un nuevo color aleatorio y actualiza la página
+        // Efectos:
+        //   - Cambia el fondo del div de color
+        //   - Actualiza el texto con el código hexadecimal
+        //   - Añade animación de transición suave
+        // =====================================================
+        function generarColor() {
+            // Generar un color hexadecimal aleatorio
+            const nuevoColor = generarColorHexAleatorio();
+
+            // Obtener referencias a los elementos del DOM
+            const colorDisplay = document.getElementById('colorDisplay');
+            const hexCode = document.getElementById('hexCode');
+
+            // Actualizar el fondo del div con el nuevo color
+            // La transición CSS hace que el cambio sea suave (0.5s)
+            colorDisplay.style.backgroundColor = nuevoColor;
+
+            // Actualizar el texto que muestra el código hexadecimal
+            hexCode.textContent = nuevoColor;
+
+            // Ejecutar la animación de brillo (shimmer)
+            colorDisplay.style.animation = 'none';
+            // Forzar el recalcular del DOM para resetear la animación
+            void colorDisplay.offsetWidth;
+            colorDisplay.style.animation = '';
+        }
+
+        // =====================================================
+        // FUNCIÓN: copiarAlPortapapeles
+        // Descripción: Copia el código hexadecimal al portapapeles
+        // Confirmación visual: muestra un mensaje temporal de éxito
+        // =====================================================
+        function copiarAlPortapapeles() {
+            // Obtener el código hexadecimal actual
+            const hexCode = document.getElementById('hexCode').textContent;
+
+            // Usar la API del portapapeles moderna (recomendada)
+            // navigator.clipboard.writeText() devuelve una promesa
+            navigator.clipboard.writeText(hexCode).then(function() {
+                // Si la copia fue exitosa, mostrar feedback visual
+                const feedback = document.getElementById('feedback');
+
+                // Añadir la clase 'mostrar' para mostrar el mensaje
+                feedback.classList.add('mostrar');
+
+                // Después de 2 segundos, ocultar el mensaje
+                setTimeout(function() {
+                    feedback.classList.remove('mostrar');
+                }, 2000);
+
+                // Log en consola para debugging
+                console.log('Código copiado:', hexCode);
+
+            }).catch(function(err) {
+                // Si hay error, mostrar alerta al usuario
+                console.error('Error al copiar:', err);
+                alert('No se pudo copiar el código. Por favor, intenta de nuevo.');
+            });
+        }
+
+        // =====================================================
+        // EVENTOS DEL TECLADO Y DEL RATÓN
+        // =====================================================
+
+        // Permitir generar color presionando Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                generarColor();
+            }
+        });
+
+        // Permitir generar color haciendo clic en el div de color
+        document.getElementById('colorDisplay').addEventListener('click', function() {
+            generarColor();
+        });
+
+        // Cambiar cursor para indicar que el div es clickeable
+        document.getElementById('colorDisplay').style.cursor = 'pointer';
+
+        // =====================================================
+        // INICIALIZACIÓN
+        // =====================================================
+
+        // Generar un color inicial al cargar la página
+        generarColor();
+    </script>
+</body>
+</html>
