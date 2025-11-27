@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Interactivo - JavaScript Básico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* ===== PANTALLA DE INICIO ===== */
+        .screen {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .start-screen h1 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .start-screen p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .category-select {
+            margin-bottom: 30px;
+        }
+
+        .category-select label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .category-select select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .category-select select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* ===== PANTALLA DE PREGUNTAS ===== */
+        .question-screen {
+            padding: 40px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .question-score {
+            color: #00b894;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .question-text {
+            font-size: 22px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            padding: 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            background: #f5f5ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-btn.correct {
+            background: #00b894;
+            border-color: #00b894;
+            color: white;
+        }
+
+        .answer-btn.incorrect {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: white;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #e8f5e9;
+            color: #00b894;
+        }
+
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #ff6b6b;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== PANTALLA DE RESULTADOS ===== */
+        .results-screen {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .results-title {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .results-score {
+            font-size: 72px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .results-total {
+            color: #999;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .results-percentage {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .results-message {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .results-message.excellent {
+            background: #e8f5e9;
+            color: #00b894;
+        }
+
+        .results-message.good {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .results-message.improve {
+            background: #ffebee;
+            color: #ff6b6b;
+        }
+
+        /* ===== BOTONES ===== */
+        button:not(.answer-btn) {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:not(.answer-btn):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        button:not(.answer-btn):active {
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .screen {
+                padding: 30px 20px;
+            }
+
+            .start-screen h1 {
+                font-size: 28px;
+            }
+
+            .question-text {
+                font-size: 18px;
+            }
+
+            .answers {
+                grid-template-columns: 1fr;
+            }
+
+            .results-score {
+                font-size: 56px;
+            }
+
+            .question-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PANTALLA DE INICIO -->
+        <div class="screen start-screen active" id="startScreen">
+            <h1>🧠 Quiz de JavaScript</h1>
+            <p>Demuestra tus conocimientos sobre JavaScript básico. Responde correctamente el máximo número de preguntas.</p>
+
+            <div class="category-select">
+                <label for="category">Selecciona una categoría:</label>
+                <select id="category">
+                    <option value="javascript">JavaScript Básico</option>
+                    <option value="variables">Variables y Tipos de Datos</option>
+                    <option value="funciones">Funciones</option>
+                </select>
+            </div>
+
+            <button onclick="iniciarQuiz()">Comenzar Quiz</button>
+        </div>
+
+        <!-- PANTALLA DE PREGUNTAS -->
+        <div class="screen question-screen" id="questionScreen">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">Pregunta 1 de 5</span>
+                <span class="question-score" id="questionScore">Aciertos: 0</span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="question-text" id="questionText">¿Cuál es la respuesta?</div>
+
+            <div class="answers" id="answersContainer"></div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- PANTALLA DE RESULTADOS -->
+        <div class="screen results-screen" id="resultsScreen">
+            <h2 class="results-title">Resultados Finales</h2>
+            <div class="results-score" id="finalScore">0</div>
+            <div class="results-total" id="resultsTotal">de 5 correctas</div>
+            <div class="results-percentage" id="resultsPercentage">0%</div>
+            <div class="results-message" id="resultsMessage">Mensaje de desempeño</div>
+            <button onclick="reintentar()">Reintentar</button>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // DATOS DEL QUIZ - PREGUNTAS Y RESPUESTAS
+        // =====================================================
+
+        // Array de objetos con preguntas sobre JavaScript
+        // Estructura: { pregunta, opciones[], correcta (índice de la opción correcta) }
+        const quizzes = {
+            javascript: [
+                {
+                    pregunta: "¿Cuál es la forma correcta de declarar una variable en JavaScript?",
+                    opciones: ["var x = 5;", "variable x = 5;", "x = 5;", "declare x = 5;"],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué devuelve typeof null en JavaScript?",
+                    opciones: ["null", "object", "undefined", "NaN"],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es el resultado de 5 + '5' en JavaScript?",
+                    opciones: ["10", "'10'", "'55'", "Error"],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué método se usa para iterar un array?",
+                    opciones: ["loop()", "forEach()", "iterate()", "map()"],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Cuál es la diferencia entre let y var?",
+                    opciones: [
+                        "let tiene scope de bloque, var de función",
+                        "No hay diferencia",
+                        "let es más antiguo",
+                        "var es mejor que let"
+                    ],
+                    correcta: 0
+                }
+            ],
+            variables: [
+                {
+                    pregunta: "¿Cuál es un tipo de dato primitivo en JavaScript?",
+                    opciones: ["Array", "Objeto", "String", "Función"],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Qué es undefined?",
+                    opciones: [
+                        "Un valor asignado a una variable",
+                        "Una variable que no está declarada",
+                        "Ambas son correctas",
+                        "Ninguna"
+                    ],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es el resultado de Number('123')?",
+                    opciones: ["'123'", "123", "NaN", "Error"],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué valor es falsy en JavaScript?",
+                    opciones: ["1", "[]", "0", "{}"],
+                    correcta: 2
+                },
+                {
+                    pregunta: "¿Cuál es el tipo de dato de [1, 2, 3]?",
+                    opciones: ["array", "object", "list", "vector"],
+                    correcta: 1
+                }
+            ],
+            funciones: [
+                {
+                    pregunta: "¿Cómo se declara una función en JavaScript?",
+                    opciones: [
+                        "function nombre() {}",
+                        "def nombre(): pass",
+                        "func nombre() {}",
+                        "method nombre() {}"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Qué es una función flecha (arrow function)?",
+                    opciones: [
+                        "() => {}",
+                        "Una función antigua",
+                        "function() ->",
+                        "Una función sin nombre"
+                    ],
+                    correcta: 0
+                },
+                {
+                    pregunta: "¿Cuál es la diferencia entre return y console.log?",
+                    opciones: [
+                        "No hay diferencia",
+                        "return devuelve valor, console.log muestra en consola",
+                        "console.log es más rápido",
+                        "return no funciona en funciones"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué es el parámetro rest (...args)?",
+                    opciones: [
+                        "Pausa la función",
+                        "Captura múltiples argumentos en un array",
+                        "Descansa la función",
+                        "Evita errores"
+                    ],
+                    correcta: 1
+                },
+                {
+                    pregunta: "¿Qué devuelve una función sin return?",
+                    opciones: ["null", "undefined", "0", "Error"],
+                    correcta: 1
+                }
+            ]
+        };
+
+        // =====================================================
+        // VARIABLES GLOBALES DEL QUIZ
+        // =====================================================
+
+        let estadoQuiz = {
+            preguntas: [],           // Preguntas actual del quiz
+            preguntaActual: 0,       // Índice de la pregunta actual
+            respuestasCorrectas: 0,  // Contador de aciertos
+            categoria: 'javascript', // Categoría seleccionada
+            respondido: false        // ¿El usuario ya respondió esta pregunta?
+        };
+
+        // =====================================================
+        // FUNCIÓN: cambiarPantalla
+        // Descripción: Cambia la pantalla activa del quiz
+        // Parámetro: screenId (id del elemento a mostrar)
+        // =====================================================
+        function cambiarPantalla(screenId) {
+            // Ocultar todas las pantallas
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            // Mostrar la pantalla solicitada
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // =====================================================
+        // FUNCIÓN: iniciarQuiz
+        // Descripción: Inicia el quiz con la categoría seleccionada
+        // Reinicia todos los contadores y carga las preguntas
+        // =====================================================
+        function iniciarQuiz() {
+            // Obtener la categoría seleccionada
+            estadoQuiz.categoria = document.getElementById('category').value;
+
+            // Reiniciar contadores
+            estadoQuiz.preguntaActual = 0;
+            estadoQuiz.respuestasCorrectas = 0;
+            estadoQuiz.respondido = false;
+
+            // Cargar preguntas de la categoría seleccionada
+            estadoQuiz.preguntas = quizzes[estadoQuiz.categoria];
+
+            // Cambiar a pantalla de preguntas
+            cambiarPantalla('questionScreen');
+
+            // Mostrar la primera pregunta
+            mostrarPregunta();
+        }
+
+        // =====================================================
+        // FUNCIÓN: mostrarPregunta
+        // Descripción: Muestra la pregunta actual y sus opciones
+        // Actualiza número, texto, progreso y botones
+        // =====================================================
+        function mostrarPregunta() {
+            // Resetear estado de respuesta
+            estadoQuiz.respondido = false;
+
+            // Obtener la pregunta actual
+            const pregunta = estadoQuiz.preguntas[estadoQuiz.preguntaActual];
+            const totalPreguntas = estadoQuiz.preguntas.length;
+            const numeroActual = estadoQuiz.preguntaActual + 1;
+
+            // Actualizar número de pregunta
+            document.getElementById('questionNumber').textContent = 
+                `Pregunta ${numeroActual} de ${totalPreguntas}`;
+
+            // Actualizar contador de aciertos
+            document.getElementById('questionScore').textContent = 
+                `Aciertos: ${estadoQuiz.respuestasCorrectas}`;
+
+            // Actualizar texto de la pregunta
+            document.getElementById('questionText').textContent = pregunta.pregunta;
+
+            // Actualizar barra de progreso
+            const progreso = (numeroActual / totalPreguntas) * 100;
+            document.getElementById('progressFill').style.width = progreso + '%';
+
+            // Limpiar feedback
+            document.getElementById('feedback').classList.remove('show', 'correct', 'incorrect');
+
+            // Crear botones de respuestas
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+
+            pregunta.opciones.forEach((opcion, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = opcion;
+                btn.onclick = () => seleccionarRespuesta(index);
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        // =====================================================
+        // FUNCIÓN: seleccionarRespuesta
+        // Descripción: Procesa la respuesta seleccionada por el usuario
+        // Parámetro: index (índice de la opción seleccionada)
+        // =====================================================
+        function seleccionarRespuesta(index) {
+            // Si ya respondió, no permitir nueva respuesta
+            if (estadoQuiz.respondido) return;
+
+            // Marcar como respondido
+            estadoQuiz.respondido = true;
+
+            // Obtener la pregunta actual
+            const pregunta = estadoQuiz.preguntas[estadoQuiz.preguntaActual];
+            const botones = document.querySelectorAll('.answer-btn');
+
+            // Obtener elemento de feedback
+            const feedback = document.getElementById('feedback');
+
+            // Validar si la respuesta es correcta
+            if (index === pregunta.correcta) {
+                // ✓ Respuesta correcta
+                estadoQuiz.respuestasCorrectas++;
+                botones[index].classList.add('correct');
+                feedback.textContent = '✓ ¡Correcto!';
+                feedback.classList.add('show', 'correct');
+                console.log('✓ Respuesta correcta');
+            } else {
+                // ✗ Respuesta incorrecta
+                botones[index].classList.add('incorrect');
+                botones[pregunta.correcta].classList.add('correct');
+                feedback.textContent = `✗ Incorrecto. La respuesta es: ${pregunta.opciones[pregunta.correcta]}`;
+                feedback.classList.add('show', 'incorrect');
+                console.log('✗ Respuesta incorrecta');
+            }
+
+            // Desactivar todos los botones
+            botones.forEach(btn => btn.disabled = true);
+
+            // Transición a siguiente pregunta después de 2 segundos
+            setTimeout(siguientePregunta, 2000);
+        }
+
+        // =====================================================
+        // FUNCIÓN: siguientePregunta
+        // Descripción: Avanza a la siguiente pregunta o muestra resultados
+        // =====================================================
+        function siguientePregunta() {
+            estadoQuiz.preguntaActual++;
+
+            // Si hay más preguntas, mostrar la siguiente
+            if (estadoQuiz.preguntaActual < estadoQuiz.preguntas.length) {
+                mostrarPregunta();
+            } else {
+                // Si no hay más preguntas, mostrar resultados
+                mostrarResultados();
+            }
+        }
+
+        // =====================================================
+        // FUNCIÓN: calcularPorcentaje
+        // Descripción: Calcula el porcentaje de aciertos
+        // Retorna: número (0-100)
+        // =====================================================
+        function calcularPorcentaje() {
+            const total = estadoQuiz.preguntas.length;
+            const correctas = estadoQuiz.respuestasCorrectas;
+            return Math.round((correctas / total) * 100);
+        }
+
+        // =====================================================
+        // FUNCIÓN: obtenerMensajeDesempeño
+        // Descripción: Genera mensaje según el porcentaje de aciertos
+        // Retorna: objeto con mensaje y clase CSS
+        // =====================================================
+        function obtenerMensajeDesempeño() {
+            const porcentaje = calcularPorcentaje();
+
+            if (porcentaje >= 80) {
+                return {
+                    mensaje: '🎉 ¡Excelente! Dominas JavaScript',
+                    clase: 'excellent'
+                };
+            } else if (porcentaje >= 60) {
+                return {
+                    mensaje: '👍 Bien hecho. Tienes buena base',
+                    clase: 'good'
+                };
+            } else {
+                return {
+                    mensaje: '📚 Puedes mejorar. Sigue practicando',
+                    clase: 'improve'
+                };
+            }
+        }
+
+        // =====================================================
+        // FUNCIÓN: mostrarResultados
+        // Descripción: Muestra la pantalla de resultados finales
+        // =====================================================
+        function mostrarResultados() {
+            // Calcular estadísticas
+            const correctas = estadoQuiz.respuestasCorrectas;
+            const total = estadoQuiz.preguntas.length;
+            const porcentaje = calcularPorcentaje();
+            const desempeño = obtenerMensajeDesempeño();
+
+            // Actualizar elementos de resultado
+            document.getElementById('finalScore').textContent = correctas;
+            document.getElementById('resultsTotal').textContent = `de ${total} correctas`;
+            document.getElementById('resultsPercentage').textContent = `${porcentaje}%`;
+
+            const mensajeDiv = document.getElementById('resultsMessage');
+            mensajeDiv.textContent = desempeño.mensaje;
+            mensajeDiv.className = `results-message ${desempeño.clase}`;
+
+            // Log en consola
+            console.log(`Quiz finalizado: ${correctas}/${total} (${porcentaje}%)`);
+
+            // Cambiar a pantalla de resultados
+            cambiarPantalla('resultsScreen');
+        }
+
+        // =====================================================
+        // FUNCIÓN: reintentar
+        // Descripción: Reinicia el quiz y vuelve a la pantalla de inicio
+        // =====================================================
+        function reintentar() {
+            // Resetear estado
+            estadoQuiz.preguntaActual = 0;
+            estadoQuiz.respuestasCorrectas = 0;
+            estadoQuiz.respondido = false;
+
+            // Volver a pantalla de inicio
+            cambiarPantalla('startScreen');
+        }
+
+        // =====================================================
+        // LOG INICIAL
+        // =====================================================
+        console.log('📝 Quiz cargado. Total de categorías:', Object.keys(quizzes).length);
+    </script>
+</body>
+</html>
